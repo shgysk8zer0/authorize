@@ -4,6 +4,7 @@ namespace shgysk8zer0\Authorize\Traits;
 
 use \net\authorize\api\contract\v1\TransactionResponseType\MessagesAType\MessageAType as Message;
 use \net\authorize\api\contract\v1\TransactionResponseType\ErrorsAType\ErrorAType as Error;
+use \net\authorize\api\contract\v1\TransactionResponseType as Transaction;
 
 trait Parsers
 {
@@ -38,7 +39,7 @@ trait Parsers
 	 * @param  Error    $error [description]
 	 * @return stdClass        [description]
 	 */
-	private function _getErrors(Error $error) : stdClass
+	private function _getErrors(Error $error) : \stdClass
 	{
 		$obj = new \stdClass();
 		$obj->text = $error->getErrorText();

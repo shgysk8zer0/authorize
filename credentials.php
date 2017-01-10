@@ -1,6 +1,8 @@
 <?php
 namespace shgysk8zer0\Authorize;
 
+use \net\authorize\api\contract\v1 as AnetAPI;
+
 final class Credentials extends \ArrayObject
 {
 	public function __construct(

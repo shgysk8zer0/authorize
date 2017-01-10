@@ -9,20 +9,23 @@ use \net\authorize\api\constants\ANetEnvironment as AuthEnv;
 final class authCaptureTransaction extends Abstracts\Request
 {
 	const TRANSACTION_TYPE = 'authCaptureTransaction';
+
 	public function __invoke(Float $price)
 	{
+		$card = $this->_card;
+		$creds = $this->_creds;
 		// Create the payment data for a credit card
 		$paymentOne = new AnetAPI\PaymentType();
-		$paymentOne->setCreditCard($this->_card());
+		$paymentOne->setCreditCard($card());
 
 		// Create a transaction
 		$transactionRequestType = new AnetAPI\TransactionRequestType();
-		$transactionRequestType->setTransactionType(__CLASS__);
+		$transactionRequestType->setTransactionType(self::TRANSACTION_TYPE);
 		$transactionRequestType->setAmount($price);
 		$transactionRequestType->setPayment($paymentOne);
 
 		$request = new AnetAPI\CreateTransactionRequest();
-		$request->setMerchantAuthentication($this->_creds());
+		$request->setMerchantAuthentication($creds());
 		$request->setTransactionRequest($transactionRequestType);
 		$controller = new AnetController\CreateTransactionController($request);
 		$response = $controller->executeWithApiResponse(

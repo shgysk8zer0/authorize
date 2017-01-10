@@ -2,7 +2,9 @@
 
 namespace shgysk8zer0\Authorize;
 
-final class CreditCard
+use \net\authorize\api\contract\v1 as AnetAPI;
+
+final class CreditCard extends \ArrayObject
 {
 	private $_name;
 	private $_number;
@@ -16,21 +18,29 @@ final class CreditCard
 		Int $csc
 	)
 	{
-		$this->name = $name;
-		$this->number = $number;
-		$this->expires = $expires;
-		$this->csc = $csc;
+		parent::__construct([
+			'name' => $name,
+			'number' => $number,
+			'expires' => $expires,
+			'csc' => $csc,
+		]);
 	}
 
 	public function __get($prop)
 	{
-		return $this->{$prop};
+		return $this[$prop];
+	}
+
+	public function __isset($prop)
+	{
+		return array_key_exists($prop, $this);
 	}
 
 	public function __invoke()
 	{
 		$creditCard = new AnetAPI\CreditCardType();
-		$creditCard->setCardNumber($this->_number);
-		$creditCard->setExpirationDate($this->_expires->format('Y-m'));
+		$creditCard->setCardNumber($this['number']);
+		$creditCard->setExpirationDate($this['expires']->format('Y-m'));
+		return $creditCard;
 	}
 }

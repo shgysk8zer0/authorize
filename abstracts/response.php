@@ -5,8 +5,8 @@ use \net\authorize\api\contract\v1\CreateTransactionResponse as Resp;
 use \net\authorize\api\contract\v1\TransactionResponseType as Transaction;
 abstract class Response
 {
-	use Traits\Parsers;
-	use Traits\toString;
+	use \shgysk8zer0\Authorize\Traits\Parsers;
+	use \shgysk8zer0\Authorize\Traits\toString;
 
 	public $code = 0;
 	public $messages = array();

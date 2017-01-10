@@ -4,7 +4,6 @@ namespace shgysk8zer0\Authorize\Traits;
 
 trait toString
 {
-
 	/**
 	 * [__toString description]
 	 * @return string [description]

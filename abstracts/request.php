@@ -15,9 +15,4 @@ abstract class Request
 		$this->_creds = $creds;
 		$this->_card = $card;
 	}
-
-	public function __toString()
-	{
-		return __CLASS__;
-	}
 }

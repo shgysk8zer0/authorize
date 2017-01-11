@@ -42,7 +42,6 @@ final class ChargeCard extends Abstracts\Request
 		// Common setup for API credentials
 		$refId = 'ref' . time();
 		// Create the payment data for a credit card
-		$creditCard = $card();
 		$paymentOne = new AnetAPI\PaymentType();
 		$paymentOne->setCreditCard($card());
 		// Order info
@@ -55,8 +54,9 @@ final class ChargeCard extends Abstracts\Request
 		foreach($this->_items as $item) {
 			$lineitem = new AnetAPI\LineItemType();
 			// According to email, `ItemId` is name, & `Name` is description
-			$lineitem->setItemId($item->name); // Required
-			$lineitem->setName($item->description); // Required
+			$lineitem->setItemId($item->id); // Required
+			$lineitem->setName($item->name); // Required
+			$lineitem->setDescription($item->description);
 			$lineitem->setQuantity(isset($item->quantity) ? $item->quantity : '1');
 			$lineitem->setUnitPrice(floatval($item->price));
 			if (isset($item->tax) and is_numeric($item->tax)) {

@@ -8,6 +8,8 @@ use \shgysk8zer0\Core\Console as Console;
 
 final class ChargeCard extends Abstracts\Request
 {
+	const TYPE = 'authCaptureTransaction';
+
 	private $_billing;
 	private $_shipping;
 	private $_items;
@@ -29,6 +31,9 @@ final class ChargeCard extends Abstracts\Request
 
 	public function __invoke(Items $items = null)
 	{
+		if ($this->getInvoice() === 0) {
+			throw new \Exception('Invoice not set.');
+		}
 		if (isset($items)) {
 			$this->addItems($items);
 		}
@@ -42,25 +47,22 @@ final class ChargeCard extends Abstracts\Request
 		$paymentOne->setCreditCard($card());
 		// Order info
 		$order = new AnetAPI\OrderType();
-		$order->setInvoiceNumber("101");
-		$order->setDescription("Golf Shirts");
+		$order->setInvoiceNumber($this->getInvoice());
+		$order->setDescription($this->getDescription());
 
 		$transactionRequestType = new AnetAPI\TransactionRequestType();
-		$transactionRequestType->setTransactionType("authCaptureTransaction");
+		$transactionRequestType->setTransactionType(self::TYPE);
 		foreach($this->_items as $item) {
-			Console::info($item);
 			$lineitem = new AnetAPI\LineItemType();
-			$lineitem->setItemId("Shirts");
-			$lineitem->setName($item->name);
-			$lineitem->setDescription($item->description);
+			// According to email, `ItemId` is name, & `Name` is description
+			$lineitem->setItemId($item->name); // Required
+			$lineitem->setName($item->description); // Required
 			$lineitem->setQuantity(isset($item->quantity) ? $item->quantity : '1');
 			$lineitem->setUnitPrice(floatval($item->price));
 			if (isset($item->tax) and is_numeric($item->tax)) {
 				$lineitem->setTaxable('Y');
-				$tax =  new AnetAPI\ExtendedAmountType();
-				$tax->setName("level 2 tax name");
+				$tax = new AnetAPI\ExtendedAmountType();
 				$tax->setAmount(floatval($item->tax));
-				$tax->setDescription("level 2 tax");
 				$transactionRequestType->setTax($tax);
 			} else {
 				$lineitem->setTaxable('N');
@@ -68,24 +70,17 @@ final class ChargeCard extends Abstracts\Request
 			$transactionRequestType->addToLineItems($lineitem);
 		}
 		$transactionRequestType->setAmount($this->_items->getTotal());
-		// Tax info
-
-		// Customer info
-		$customer = new AnetAPI\CustomerDataType();
-		$customer->setId("15");
-		// PO Number
-		$ponumber = "15";
 
 		//create a transaction
 		$transactionRequestType->setPayment($paymentOne);
 		$transactionRequestType->setOrder($order);
-		$transactionRequestType->setPoNumber($ponumber);
-		$transactionRequestType->setCustomer($customer);
 
 		if (isset($this->_billing)) {
 			$billto = $this->_billing;
 			$transactionRequestType->setBillTo($billto());
+			$customer = new AnetAPI\CustomerDataType();
 			$customer->setEmail($billto->email);
+			$transactionRequestType->setCustomer($customer);
 			unset($billto);
 		} else {
 			throw new \Exception(sprintf('No billing address given in %s', __CLASS__));

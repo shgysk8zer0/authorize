@@ -18,6 +18,24 @@ final class Credentials extends \ArrayObject
 		]);
 	}
 
+	public static function loadFromIniFile(
+		$file = 'authorize.ini',
+		$sandbox = true
+	)
+	{
+		$creds = parse_ini_file($file, true);
+		$env = $sandbox ? 'sandbox' : 'production';
+		if (array_key_exists($env, $creds)) {
+			return new self(
+				$creds[$env]['appid'],
+				$creds[$env]['key'],
+				$env === 'sandbox'
+			);
+		} else {
+			throw new \Exception("$env credentials not found in $file.");
+		}
+	}
+
 	public function __get(String $prop)
 	{
 		return $this->__isset($prop) ? $this[$prop] : null;

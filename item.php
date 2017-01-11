@@ -6,7 +6,8 @@ final class Item extends Abstracts\Storage
 	const REQUIRED = [
 		'price',
 		'name',
-		'description'
+		'description',
+		'id',
 	];
 
 	public function __construct(Array $data = array())

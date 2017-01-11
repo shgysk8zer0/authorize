@@ -44,6 +44,9 @@ abstract class Address extends Storage
 			if (isset($this->company)) {
 				$addr->setCompany($this->company);
 			}
+			if (isset($this->tel) and method_exists($addr, 'setPhoneNumber')) {
+				$addr->setPhoneNumber($this->tel);
+			}
 			$addr->setAddress($this->address);
 			$addr->setCity($this->city);
 			$addr->setState($this->state);

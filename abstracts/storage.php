@@ -2,7 +2,7 @@
 
 namespace shgysk8zer0\Authorize\Abstracts;
 use \shgysk8zer0\Core_API as API;
-abstract class Storage implements \Iterator
+abstract class Storage implements \Iterator, \JsonSerializable
 {
 	use API\Traits\Magic\Set;
 	use API\Traits\Magic\Get;
@@ -23,5 +23,15 @@ abstract class Storage implements \Iterator
 	final protected function _setData(Array $props = array())
 	{
 		array_map([$this, '__set'], array_keys($props), array_values($props));
+	}
+
+	final public function __debugInfo()
+	{
+		return $this->{self::MAGIC_PROPERTY};
+	}
+
+	final public function jsonSerialize()
+	{
+		return $this->{self::MAGIC_PROPERTY};
 	}
 }

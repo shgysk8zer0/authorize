@@ -8,25 +8,27 @@ use \shgysk8zer0\Core\Console as Console;
 
 final class ChargeCard extends Abstracts\Request
 {
+	use Traits\ShippingAddr;
+	use Traits\BillingAddr;
+
 	const TYPE = 'authCaptureTransaction';
 
-	private $_billing;
-	private $_shipping;
-	private $_items;
-
-	public function addItem(Item $item)
+	public function __debugInfo()
 	{
-		if (is_null($this->_items)) {
-			$this->_items = new Items;
-		}
-		return $this->_items->addItem($item);
+		$info = parent::{__FUNCTION__}();
+		return array_merge($info, [
+			'ShippingAddr' => $this->_shipping,
+			'BillingAddr' => $this->_billing,
+		]);
 	}
 
-	public function addItems(Items $items)
+	public function jsonSerialize()
 	{
-		foreach ($items as $item) {
-			$this->addItem($item);
-		}
+		$info = parent::{__FUNCTION__}();
+		return array_merge($info, [
+			'ShippingAddr' => $this->_shipping,
+			'BillingAddr' => $this->_billing,
+		]);
 	}
 
 	public function __invoke(Items $items = null)
@@ -91,6 +93,7 @@ final class ChargeCard extends Abstracts\Request
 			$transactionRequestType->setShipTo($shipto());
 			unset($shipto);
 		}
+
 		$request = new AnetAPI\CreateTransactionRequest();
 		$request->setMerchantAuthentication($creds());
 		$request->setRefId( $refId);
@@ -101,23 +104,5 @@ final class ChargeCard extends Abstracts\Request
 		);
 
 		return isset($response) ? new Response($response) : false;
-	}
-
-	public function setBillingAddress(BillingAddress $addr)
-	{
-		if ($addr->validate()) {
-			$this->_billing = $addr;
-		} else {
-			throw new \InvalidArgumentException(sprintf(
-				'Missing data in %s: [%s]',
-				get_class($addr),
-				join(', ', $addr->getMissing())
-			));
-		}
-	}
-
-	public function setShippingAddress(ShippingAddress $addr)
-	{
-		$this->_shipping = $addr;
 	}
 }

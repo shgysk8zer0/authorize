@@ -2,8 +2,26 @@
 
 namespace shgysk8zer0\Authorize;
 
-final class Items extends \SplObjectStorage
+final class Items extends \SplObjectStorage implements \JsonSerializable
 {
+	public function __debugInfo()
+	{
+		$items = [];
+		foreach ($this as $item) {
+			$items[] = $item;
+		}
+		return $items;
+	}
+
+	public function jsonSerialize()
+	{
+		$items = [];
+		foreach ($this as $item) {
+			$items[] = $item;
+		}
+		return $items;
+	}
+
 	public function addItem(Item $item)
 	{
 		if ($item->validate()) {
